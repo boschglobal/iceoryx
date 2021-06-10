@@ -49,6 +49,7 @@ EXAMPLE_FLAG="OFF"
 BUILD_ALL_FLAG="OFF"
 BUILD_SHARED="OFF"
 TOML_FLAG="ON"
+JSON_FLAG="ON"
 COMPONENTS="iceoryx_posh iceoryx_hoofs iceoryx_introspection iceoryx_binding_c iceoryx_component iceoryx_dds"
 TOOLCHAIN_FILE=""
 
@@ -161,6 +162,11 @@ while (( "$#" )); do
         TOML_FLAG="OFF"
         shift 1
         ;;
+    "json-config-off")
+        echo " [i] Build without JSON Support"
+        JSON_FLAG="OFF"
+        shift 1
+        ;;
     "sanitize")
         echo " [i] Build with sanitizers"
         BUILD_TYPE="Debug"
@@ -205,6 +211,7 @@ while (( "$#" )); do
         echo "    package               Create a debian package from clean build in build_package"
         echo "    test                  Build and run all tests in all iceoryx components"
         echo "    toml-config-off       Build without TOML File support"
+        echo "    json-config-off       Build without JSON File support"
         echo "    dds-gateway           Build the iceoryx dds gateway"
         echo "    binding-c             Build the iceoryx C-Binding"
         echo "    one-to-many-only      Restrict to 1:n communication only"
@@ -273,6 +280,7 @@ cmake -DCMAKE_BUILD_TYPE=$BUILD_TYPE \
       -DROUDI_ENVIRONMENT=$ROUDI_ENV_FLAG \
       -DEXAMPLES=$EXAMPLE_FLAG \
       -DTOML_CONFIG=$TOML_FLAG \
+      -DJSON_CONFIG=$JSON_FLAG \
       -DBUILD_DOC=$BUILD_DOC \
       -DDDS_GATEWAY=$DDS_GATEWAY_FLAG \
       -DBINDING_C=$BINDING_C_FLAG \
