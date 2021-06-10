@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 #include "iceoryx_posh/roudi/roudi_config_json_file_provider.hpp"
-#include "iceoryx_posh/internal/log/posh_logging.hpp"
-#include "iceoryx_posh/roudi/roudi_cmd_line_parser.hpp"
 #include "iceoryx_hoofs/cxx/vector.hpp"
 #include "iceoryx_hoofs/internal/file_reader/file_reader.hpp"
 #include "iceoryx_hoofs/posix_wrapper/posix_access_rights.hpp"
+#include "iceoryx_posh/internal/log/posh_logging.hpp"
+#include "iceoryx_posh/roudi/roudi_cmd_line_parser.hpp"
 
 #include "iceoryx_hoofs/platform/getopt.hpp"
 #include <string>
@@ -27,7 +27,7 @@ namespace roudi
 {
 JsonRouDiConfigFileProvider::JsonRouDiConfigFileProvider(iox::config::CmdLineArgs_t& cmdLineArgs)
 {
-   /// don't print additional output if not running
+    /// don't print additional output if not running
     if (cmdLineArgs.run)
     {
         if (cmdLineArgs.configFilePath.empty())
@@ -37,19 +37,19 @@ JsonRouDiConfigFileProvider::JsonRouDiConfigFileProvider(iox::config::CmdLineArg
 
             if (configFile.IsOpen())
             {
-            	LogWarn() << "No config file provided. Using '" << defaultConfigJsonPath << "'";
+                LogWarn() << "No config file provided. Using '" << defaultConfigJsonPath << "'";
                 m_customConfigFilePath = defaultConfigJsonPath;
             }
             else
             {
-            	LogWarn() << "No config file provided and also not found at '" << defaultConfigJsonPath
+                LogWarn() << "No config file provided and also not found at '" << defaultConfigJsonPath
                           << "'. Falling back to built-in config.";
             }
         }
-        else {
-        	m_customConfigFilePath = cmdLineArgs.configFilePath;
+        else
+        {
+            m_customConfigFilePath = cmdLineArgs.configFilePath;
         }
-
     }
 }
 
@@ -99,6 +99,14 @@ iox::cxx::expected<iox::RouDiConfig_t, iox::roudi::RouDiConfigFileParseError> Js
 {
     json_t mem[NUMBER_OF_JSON_NODES];
     std::string content, line;
+
+    // Early exit in case no config file path was provided
+    if (m_customConfigFilePath.empty())
+    {
+        iox::RouDiConfig_t defaultConfig;
+        defaultConfig.setDefaults();
+        return iox::cxx::success<iox::RouDiConfig_t>(defaultConfig);
+    }
 
     iox::cxx::FileReader reader(m_customConfigFilePath, "", iox::cxx::FileReader::ErrorMode::Inform);
     while (reader.ReadLine(line))
@@ -150,10 +158,10 @@ iox::cxx::expected<iox::RouDiConfig_t, iox::roudi::RouDiConfigFileParseError> Js
             {
                 return iox::cxx::error<iox::roudi::RouDiConfigFileParseError>(meepooConfig.get_error());
             }
-            parsedConfig.m_sharedMemorySegments.push_back({
-                iox::posix::PosixGroup::string_t(iox::cxx::TruncateToCapacity, reader),
-                iox::posix::PosixGroup::string_t(iox::cxx::TruncateToCapacity, writer),
-                meepooConfig.value()});
+            parsedConfig.m_sharedMemorySegments.push_back(
+                {iox::posix::PosixGroup::string_t(iox::cxx::TruncateToCapacity, reader),
+                 iox::posix::PosixGroup::string_t(iox::cxx::TruncateToCapacity, writer),
+                 meepooConfig.value()});
         }
         segCount++;
     }

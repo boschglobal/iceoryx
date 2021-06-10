@@ -303,18 +303,18 @@ endif(CMAKE_SYSTEM_NAME MATCHES QNX)
 target_compile_options(iceoryx_posh_roudi PRIVATE ${ICEORYX_WARNINGS} ${ICEORYX_SANITIZER_FLAGS})
 
 if (JSON_CONFIG)
-    add_library(iceoryx_posh_roudi_json
+    add_library(iceoryx_posh_config_json
         source/roudi/roudi_config_json_file_provider.cpp
     )
     
-    add_library(${PROJECT_NAMESPACE}::iceoryx_posh_roudi_json ALIAS iceoryx_posh_roudi_json)
+    add_library(${PROJECT_NAMESPACE}::iceoryx_posh_config_json ALIAS iceoryx_posh_config_json)
 
-    target_link_libraries(iceoryx_posh_roudi_json PUBLIC tiny_json::tiny_json PRIVATE iceoryx_posh_roudi)
-    set_target_properties(iceoryx_posh_roudi_json PROPERTIES
+    target_link_libraries(iceoryx_posh_config_json PUBLIC tiny_json::tiny_json PRIVATE iceoryx_posh_roudi)
+    set_target_properties(iceoryx_posh_config_json PROPERTIES
         CXX_STANDARD_REQUIRED ON
         CXX_STANDARD ${ICEORYX_CXX_STANDARD}
     )
-    target_compile_options(iceoryx_posh_roudi_json PRIVATE ${ICEORYX_WARNINGS})
+    target_compile_options(iceoryx_posh_config_json PRIVATE ${ICEORYX_WARNINGS})
     
     add_executable(iox-roudi-json
         source/roudi/application/roudi_main_json.cpp
@@ -331,10 +331,15 @@ if (JSON_CONFIG)
         tiny_json::tiny_json
         iceoryx_hoofs::iceoryx_hoofs
         ${PROJECT_NAMESPACE}::iceoryx_posh_roudi
-        iceoryx_posh_roudi_json
+        iceoryx_posh_config_json
     )
 
     target_compile_options(iox-roudi-json PRIVATE ${ICEORYX_WARNINGS})
+
+    install(
+        FILES ${CMAKE_CURRENT_SOURCE_DIR}/etc/iceoryx/roudi_config_example.json
+        DESTINATION etc/
+        COMPONENT dev)
 
     if(PERFORM_CLANG_TIDY)
         set_target_properties(
@@ -426,6 +431,10 @@ endif()
 #
 if(TOML_CONFIG)
     set(ROUDI_EXPORT iceoryx_posh_config iox-roudi)
+endif()
+
+if (JSON_CONFIG)
+    set(ROUDI_EXPORT ${ROUDI_EXPORT} iceoryx_posh_config_json iox-roudi-json)
 endif()
 
 setup_install_directories_and_export_package(
