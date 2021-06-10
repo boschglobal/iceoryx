@@ -24,6 +24,7 @@ find_package(Threads REQUIRED)
 find_package(iceoryx_hoofs REQUIRED)
 
 option(TOML_CONFIG "TOML support for RouDi with dynamic configuration" ON)
+option(JSON_CONFIG "JSON support for RouDi with dynamic configuration" ON)
 option(ONE_TO_MANY_ONLY "Restricts communication to 1:n pattern" OFF)
 
 if(TOML_CONFIG)
@@ -37,6 +38,13 @@ include(IceoryxPackageHelper)
 include(IceoryxPlatform)
 
 include(cmake/iceoryx_posh_deployment.cmake)
+
+if(JSON_CONFIG)
+    add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/cmake/tiny_json/ ${CMAKE_BINARY_DIR}/dependencies/posh/tiny_json/prebuild)
+
+    find_package(tiny_json REQUIRED)
+endif()
+
 
 if(CMAKE_SYSTEM_NAME MATCHES Linux OR CMAKE_SYSTEM_NAME MATCHES Darwin)
     option(BUILD_SHARED_LIBS "Create shared libraries by default" ON)
@@ -294,6 +302,46 @@ endif(CMAKE_SYSTEM_NAME MATCHES QNX)
 
 target_compile_options(iceoryx_posh_roudi PRIVATE ${ICEORYX_WARNINGS} ${ICEORYX_SANITIZER_FLAGS})
 
+if (JSON_CONFIG)
+    add_library(iceoryx_posh_roudi_json
+        source/roudi/roudi_config_json_file_provider.cpp
+    )
+    
+    add_library(${PROJECT_NAMESPACE}::iceoryx_posh_roudi_json ALIAS iceoryx_posh_roudi_json)
+
+    target_link_libraries(iceoryx_posh_roudi_json PUBLIC tiny_json::tiny_json PRIVATE iceoryx_posh_roudi)
+    set_target_properties(iceoryx_posh_roudi_json PROPERTIES
+        CXX_STANDARD_REQUIRED ON
+        CXX_STANDARD ${ICEORYX_CXX_STANDARD}
+    )
+    target_compile_options(iceoryx_posh_roudi_json PRIVATE ${ICEORYX_WARNINGS})
+    
+    add_executable(iox-roudi-json
+        source/roudi/application/roudi_main_json.cpp
+    )
+    set_target_properties(iox-roudi-json PROPERTIES
+        CXX_STANDARD_REQUIRED ON
+        CXX_STANDARD ${ICEORYX_CXX_STANDARD}
+        POSITION_INDEPENDENT_CODE ON
+        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
+    )
+
+    target_link_libraries(iox-roudi-json
+        PRIVATE
+        tiny_json::tiny_json
+        iceoryx_hoofs::iceoryx_hoofs
+        ${PROJECT_NAMESPACE}::iceoryx_posh_roudi
+        iceoryx_posh_roudi_json
+    )
+
+    target_compile_options(iox-roudi-json PRIVATE ${ICEORYX_WARNINGS})
+
+    if(PERFORM_CLANG_TIDY)
+        set_target_properties(
+            iox-roudi-json PROPERTIES CXX_CLANG_TIDY "${PERFORM_CLANG_TIDY}"
+        )
+    endif(PERFORM_CLANG_TIDY)    
+endif (JSON_CONFIG)
 
 if(TOML_CONFIG)
     #
