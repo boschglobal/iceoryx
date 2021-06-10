@@ -45,7 +45,6 @@ class JsonConfig_test : public Test
     }
     virtual void SetUp()
     {
-        optind = 1;
         char str[] = "{\n"
                      "\t\"general\":{\n"
                      "\t\t\"version\" : 1\n"
@@ -74,6 +73,7 @@ class JsonConfig_test : public Test
 
     virtual void TearDown()
     {
+        optind = 0;
     }
 };
 
@@ -86,7 +86,10 @@ class JsonConfig_Failure_test : public Test
     }
     virtual void SetUp()
     {
-        optind = 1;
+    }
+    virtual void TearDown()
+    {
+        optind = 0;
     }
 
     iox::cxx::expected<iox::RouDiConfig_t, iox::roudi::RouDiConfigFileParseError> parseJson(std::string json)
