@@ -11,6 +11,8 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+//
+// SPDX-License-Identifier: Apache-2.0
 
 #include "iceoryx_posh/iceoryx_posh_types.hpp"
 #include "iceoryx_posh/mepoo/mepoo_config.hpp"
@@ -94,7 +96,7 @@ class JsonConfig_Failure_test : public Test
 
     iox::cxx::expected<iox::RouDiConfig_t, iox::roudi::RouDiConfigFileParseError> parseJson(std::string json)
     {
-    	iox::config::CmdLineParserConfigFileOption cmdLineParser;
+        iox::config::CmdLineParserConfigFileOption cmdLineParser;
         int argc = 3;
         std::string arg1("executable");
         std::string arg2("--config-file");
@@ -115,7 +117,7 @@ class JsonConfig_Failure_test : public Test
 
 TEST_F(JsonConfig_test, TestReader)
 {
-	iox::config::CmdLineParserConfigFileOption cmdLineParser;
+    iox::config::CmdLineParserConfigFileOption cmdLineParser;
     int argc = 3;
     std::string arg1("executable");
     std::string arg2("-c");

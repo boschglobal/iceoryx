@@ -20,6 +20,8 @@ project(tiny_json_build NONE)
 
 include(ExternalProject)
 
+message ("Configure Command = ${CREATE_PATH_COMMAND} ${BUILD_DIR}")
+
 ExternalProject_Add(tiny_json_build
         GIT_REPOSITORY    https://github.com/rafagafe/tiny-json.git
         GIT_TAG           08a32cacbd3c49e07de76c1ef4297bbcb134250b
