@@ -52,12 +52,9 @@ else()
     set(CREATE_PATH_COMMAND mkdir -p)
 endif(WIN32)
 
-
 configure_file(tiny_json_build.cmake.in ${DOWNLOAD_CONFIG_DIR}/CMakeLists.txt)
 configure_file(CMakeLists.txt.in ${DEPENDENCY_BASE_DIR}/CMakeLists.txt @ONLY)
 configure_file(tiny_jsonConfig.cmake.in ${DEPENDENCY_BASE_DIR}/tiny_jsonConfig.cmake @ONLY)
-
-file(MAKE_DIRECTORY ${BUILD_DIR})
 
 execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" "${TOOLCHAIN_FILE}" "${DOWNLOAD_CONFIG_DIR}"
         RESULT_VARIABLE result
