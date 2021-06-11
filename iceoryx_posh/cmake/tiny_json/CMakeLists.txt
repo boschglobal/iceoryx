@@ -73,3 +73,5 @@ if(result)
         message(FATAL_ERROR "Build step [build and install] for ${name} failed: ${result}")
 endif()
 
+list(APPEND CMAKE_PREFIX_PATH ${INSTALL_DIR})
+set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} CACHE INTERNAL "" FORCE)
